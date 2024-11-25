@@ -20,6 +20,8 @@ export default function RoomTable({
                         <TableHead className="w-[100px]">id</TableHead>
                         <TableHead>name</TableHead>
                         <TableHead >operations</TableHead>
+                        <TableHead >width</TableHead>
+                        <TableHead >length</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -29,6 +31,8 @@ export default function RoomTable({
                                 <TableRow key={room.id}>
                                     <TableCell className="font-medium">{room.id}</TableCell>
                                     <TableCell>{room.name}</TableCell>
+                                    <TableCell>{room.width}</TableCell>
+                                    <TableCell>{room.length}</TableCell>
                                     <TableCell>
                                         <Link href={'/' + '?roomid=' + room.id}>
                                         <Button>Look up</Button>

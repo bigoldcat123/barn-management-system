@@ -12,6 +12,8 @@ datasource db {
 model Room{
   id        Int     @id @default(autoincrement())
   name      String
+  width     Int
+  length    Int
   shelves   Shelf[]
 }
 model Shelf {
@@ -19,6 +21,8 @@ model Shelf {
   name      String
   rows      Int
   columns   Int
+  x         Int
+  y         Int
   stuff     Stuff[]
   room      Room    @relation(fields: [roomId], references: [id])
   roomId    Int

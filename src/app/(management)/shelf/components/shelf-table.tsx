@@ -33,6 +33,8 @@ export default function ShelfTable({
                         <TableHead>rows</TableHead>
                         <TableHead >columns</TableHead>
                         <TableHead >operations</TableHead>
+                        <TableHead >x</TableHead>
+                        <TableHead >y</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -44,6 +46,8 @@ export default function ShelfTable({
                                     <TableCell>{shelf.name}</TableCell>
                                     <TableCell>{shelf.rows}</TableCell>
                                     <TableCell >{shelf.columns}</TableCell>
+                                    <TableCell>{shelf.x}</TableCell>
+                                    <TableCell >{shelf.y}</TableCell>
                                     <TableCell >TODO</TableCell>
                                 </TableRow>
                             )
