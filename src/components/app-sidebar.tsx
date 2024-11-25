@@ -70,12 +70,7 @@ const data = {
       name: "Category",
       url: "/category",
       icon: Map,
-    },
-    {
-      name: "3D",
-      url: "/",
-      icon: Box,
-    },
+    }
   ],
 }
 

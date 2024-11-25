@@ -1,8 +1,21 @@
-'use client'
-import Image from "next/image";
+import { getShelivesByRoomId } from "@/dao/shelf";
+import ThreedRoom from "./threed-room";
 
-export default function Home() {
+type SearchParams = Promise<{
+  roomid: string
+}>
+export default async function Home({
+  searchParams
+}: {
+  searchParams: SearchParams
+}) {
+  let roomid = (await searchParams)['roomid']
+
+  const shelves = await getShelivesByRoomId(Number.parseInt(roomid))
+
   return (
-    <div>helo</div>
+    <>
+    <ThreedRoom data={shelves!}></ThreedRoom>
+    </>
   );
 }
