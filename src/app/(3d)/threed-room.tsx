@@ -22,7 +22,7 @@ export default function ThreedRoom({
 }) {
   console.log(data)
   const container = useRef<HTMLDivElement>(null);
-  function createBarn(scene: THREE.Scene, width:number,length:number) {
+  function createBarn(scene: THREE.Scene, width: number, length: number) {
     // 围墙参数
     const wallHeight = 3;
     const wallThickness = 0.3;
@@ -42,7 +42,7 @@ export default function ThreedRoom({
 
     // 创建四面墙
     const frontWall = new THREE.Mesh(
-      new THREE.BoxGeometry(wallLength, wallHeight, wallThickness),
+      new THREE.BoxGeometry(wallWidth, wallHeight, wallThickness),
       wallMaterial
     );
     frontWall.position.set(0, wallHeight / 2, -wallLength / 2);
@@ -62,298 +62,49 @@ export default function ThreedRoom({
     // 添加墙体到场景
     scene.add(frontWall, backWall, leftWall, rightWall);
   }
+
   useEffect(() => {
-    let camera:THREE.PerspectiveCamera, scene:THREE.Scene, renderer:THREE.WebGLRenderer, controls:PointerLockControls;
-
-    const objects:any[] = [];
-
-    let raycaster:THREE.Raycaster;
-
-    let moveForward = false;
-    let moveBackward = false;
-    let moveLeft = false;
-    let moveRight = false;
-    let canJump = false;
-
-    let prevTime = performance.now();
-    const velocity = new THREE.Vector3();
-    const direction = new THREE.Vector3();
-    const vertex = new THREE.Vector3();
-    const color = new THREE.Color();
-
-    init();
-
-    function init() {
-
-      camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
-      camera.position.y = 10;
-
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color( 0xffffff );
-      scene.fog = new THREE.Fog( 0xffffff, 0, 750 );
-
-      const light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 2.5 );
-      light.position.set( 0.5, 1, 0.75 );
-      scene.add( light );
-
-      controls = new PointerLockControls( camera, document.body );
-
-      const blocker = document.getElementById( 'blocker' )!;
-      const instructions = document.getElementById( 'instructions' )!;
-
-      instructions.addEventListener( 'click', function () {
-
-        controls.lock();
-
-      } );
-
-      controls.addEventListener( 'lock', function () {
-
-        instructions.style.display = 'none';
-        blocker.style.display = 'none';
-
-      } );
-
-      controls.addEventListener( 'unlock', function () {
-
-        blocker.style.display = 'block';
-        instructions.style.display = '';
-
-      } );
-
-      scene.add( controls.object );
-
-      const onKeyDown = function ( event:KeyboardEvent ) {
-
-        switch ( event.code ) {
-
-          case 'ArrowUp':
-          case 'KeyW':
-            moveForward = true;
-            break;
-
-          case 'ArrowLeft':
-          case 'KeyA':
-            moveLeft = true;
-            break;
-
-          case 'ArrowDown':
-          case 'KeyS':
-            moveBackward = true;
-            break;
-
-          case 'ArrowRight':
-          case 'KeyD':
-            moveRight = true;
-            break;
-
-          case 'Space':
-            if ( canJump === true ) velocity.y += 350;
-            canJump = false;
-            break;
-
-        }
-
-      };
-
-      const onKeyUp = function ( event:KeyboardEvent ) {
-
-        switch ( event.code ) {
-
-          case 'ArrowUp':
-          case 'KeyW':
-            moveForward = false;
-            break;
-
-          case 'ArrowLeft':
-          case 'KeyA':
-            moveLeft = false;
-            break;
-
-          case 'ArrowDown':
-          case 'KeyS':
-            moveBackward = false;
-            break;
-
-          case 'ArrowRight':
-          case 'KeyD':
-            moveRight = false;
-            break;
-
-        }
-
-      };
-
-      document.addEventListener( 'keydown', onKeyDown );
-      document.addEventListener( 'keyup', onKeyUp );
-
-      raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
-
-      // floor
-
-      let floorGeometry:any = new THREE.PlaneGeometry( 2000, 2000, 100, 100 );
-      floorGeometry.rotateX( - Math.PI / 2 );
-
-      // vertex displacement
-
-      let position = floorGeometry.attributes.position;
-
-      for ( let i = 0, l = position.count; i < l; i ++ ) {
-
-        vertex.fromBufferAttribute( position, i );
-
-        vertex.x += Math.random() * 20 - 10;
-        vertex.y += Math.random() * 2;
-        vertex.z += Math.random() * 20 - 10;
-
-        position.setXYZ( i, vertex.x, vertex.y, vertex.z );
-
-      }
-
-      floorGeometry = floorGeometry.toNonIndexed(); // ensure each face has unique vertices
-
-      position = floorGeometry.attributes.position;
-      const colorsFloor = [];
-
-      for ( let i = 0, l = position.count; i < l; i ++ ) {
-
-        color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75, THREE.SRGBColorSpace );
-        colorsFloor.push( color.r, color.g, color.b );
-
-      }
-
-      floorGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colorsFloor, 3 ) );
-
-      const floorMaterial = new THREE.MeshBasicMaterial( { vertexColors: true } );
-
-      const floor = new THREE.Mesh( floorGeometry, floorMaterial );
-      scene.add( floor );
-
-      // objects
-
-      const boxGeometry = new THREE.BoxGeometry( 20, 20, 20 ).toNonIndexed();
-
-      position = boxGeometry.attributes.position;
-      const colorsBox = [];
-
-      for ( let i = 0, l = position.count; i < l; i ++ ) {
-
-        color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75, THREE.SRGBColorSpace );
-        colorsBox.push( color.r, color.g, color.b );
-
-      }
-
-      boxGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colorsBox, 3 ) );
-
-      for ( let i = 0; i < 500; i ++ ) {
-
-        const boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: true } );
-        boxMaterial.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75, THREE.SRGBColorSpace );
-
-        const box = new THREE.Mesh( boxGeometry, boxMaterial );
-        box.position.x = Math.floor( Math.random() * 20 - 10 ) * 20;
-        box.position.y = Math.floor( Math.random() * 20 ) * 20 + 10;
-        box.position.z = Math.floor( Math.random() * 20 - 10 ) * 20;
-
-        scene.add( box );
-        objects.push( box );
-
-      }
-
-      //
-
-      renderer = new THREE.WebGLRenderer( { antialias: true } );
-      renderer.setPixelRatio( window.devicePixelRatio );
-      renderer.setSize( window.innerWidth, window.innerHeight );
-      renderer.setAnimationLoop( animate );
-      document.body.appendChild( renderer.domElement );
-
-      //
-
-      window.addEventListener( 'resize', onWindowResize );
-
-    }
-
-    function onWindowResize() {
-
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-
-      renderer.setSize( window.innerWidth, window.innerHeight );
-
-    }
-
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    // 添加坐标轴辅助线
+    const axesHelper = new THREE.AxesHelper(5); // 参数为轴的长度
+    scene.add(axesHelper);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+    camera.position.z = 5;
+    let control = new OrbitControls(camera, renderer.domElement)
+    control.update()
+    
+    createBarn(scene, data?.width! + 2,data?.length! + 2)
+    // for (let index = 0; index < 60; index++) {
+    //   for (let j = 0; j < 30; j++) {
+    //     createShelf(j - data!.width! / 2 ,index - data!.length / 2,scene,index * j + 1000);
+    //   }
+    // }
+    data?.shelves.forEach(shelf => {
+      createShelf(shelf,data.length,data.width,scene);
+    })
     function animate() {
-
-      const time = performance.now();
-
-      if ( controls.isLocked === true ) {
-
-        raycaster.ray.origin.copy( controls.object.position );
-        raycaster.ray.origin.y -= 10;
-
-        const intersections = raycaster.intersectObjects( objects, false );
-
-        const onObject = intersections.length > 0;
-
-        const delta = ( time - prevTime ) / 1000;
-
-        velocity.x -= velocity.x * 10.0 * delta;
-        velocity.z -= velocity.z * 10.0 * delta;
-
-        velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
-
-        direction.z = Number( moveForward ) - Number( moveBackward );
-        direction.x = Number( moveRight ) - Number( moveLeft );
-        direction.normalize(); // this ensures consistent movements in all directions
-
-        if ( moveForward || moveBackward ) velocity.z -= direction.z * 400.0 * delta;
-        if ( moveLeft || moveRight ) velocity.x -= direction.x * 400.0 * delta;
-
-        if ( onObject === true ) {
-
-          velocity.y = Math.max( 0, velocity.y );
-          canJump = true;
-
-        }
-
-        controls.moveRight( - velocity.x * delta );
-        controls.moveForward( - velocity.z * delta );
-
-        controls.object.position.y += ( velocity.y * delta ); // new behavior
-
-        if ( controls.object.position.y < 10 ) {
-
-          velocity.y = 0;
-          controls.object.position.y = 10;
-
-          canJump = true;
-
-        }
-
-      }
-
-      prevTime = time;
-
-      renderer.render( scene, camera );
-
+      control.update()
+      renderer.render(scene, camera);
     }
+    renderer.setAnimationLoop(animate);
   }, [])
   return (
     <>
-     <div id="blocker">
-			<div id="instructions">
-				<p>
-					Click to play
-				</p>
-				<p>
-					Move: WASD<br/>
-					Jump: SPACE<br/>
-					Look: MOUSE
-				</p>
-			</div>
-		</div>
 
     </>
   );
+}
+
+function createShelf(shelf:Prisma.ShelfGetPayload<{include:{
+  stuff: true
+}}>,length: number, width: number, scene: THREE.Scene,color: number = 0x00ff00) {
+  // throw new Error("Function not implemented.");
+  const geo = new THREE.BoxGeometry(2, shelf.rows * 0.5, shelf.columns * 0.5);
+  const mat = new THREE.MeshBasicMaterial({ color: color });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(shelf.x - width / 2, shelf.rows * 0.25, shelf.y - length / 2);
+  scene.add(mesh);
 }
