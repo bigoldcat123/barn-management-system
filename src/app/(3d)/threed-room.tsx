@@ -75,15 +75,16 @@ export default function ThreedRoom({
     camera.position.z = 5;
     let control = new OrbitControls(camera, renderer.domElement)
     control.update()
-    
-    createBarn(scene, data?.width! + 2,data?.length! + 2)
+
+    createBarn(scene, data?.width! + 2, data?.length! + 2)
     // for (let index = 0; index < 60; index++) {
     //   for (let j = 0; j < 30; j++) {
     //     createShelf(j - data!.width! / 2 ,index - data!.length / 2,scene,index * j + 1000);
     //   }
     // }
+    //
     data?.shelves.forEach(shelf => {
-      createShelf(shelf,data.length,data.width,scene);
+      createShelf(shelf, data.length, data.width, scene);
     })
     function animate() {
       control.update()
@@ -98,9 +99,11 @@ export default function ThreedRoom({
   );
 }
 
-function createShelf(shelf:Prisma.ShelfGetPayload<{include:{
-  stuff: true
-}}>,length: number, width: number, scene: THREE.Scene,color: number = 0x00ff00) {
+function createShelf(shelf: Prisma.ShelfGetPayload<{
+  include: {
+    stuff: true
+  }
+}>, length: number, width: number, scene: THREE.Scene, color: number = 0x00ff00) {
   // throw new Error("Function not implemented.");
   const geo = new THREE.BoxGeometry(2, shelf.rows * 0.5, shelf.columns * 0.5);
   const mat = new THREE.MeshBasicMaterial({ color: color });
