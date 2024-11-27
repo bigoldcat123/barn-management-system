@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Room } from "@prisma/client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function RoomTable({
@@ -11,6 +12,16 @@ export default function RoomTable({
     data: Room[]
 }) {
     const [rooms, setRooms] = useState<Room[]>(data)
+
+    const router = useRouter();
+    function lookUp (roomid: number) {
+        const p = new URLSearchParams({
+            roomid: roomid.toString()
+        })
+        console.log('/?' + p.toString());
+        
+        router.push('/?' + p.toString())
+    }
     return (
         <>
             <Table>
@@ -19,9 +30,9 @@ export default function RoomTable({
                     <TableRow>
                         <TableHead className="w-[100px]">id</TableHead>
                         <TableHead>name</TableHead>
-                        <TableHead >operations</TableHead>
                         <TableHead >width</TableHead>
                         <TableHead >length</TableHead>
+                        <TableHead >operations</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -34,10 +45,9 @@ export default function RoomTable({
                                     <TableCell>{room.width}</TableCell>
                                     <TableCell>{room.length}</TableCell>
                                     <TableCell>
-                                        <Link href={'/' + '?roomid=' + room.id}>
-                                        <Button>Look up</Button>
-                                        </Link>
-                                        
+                                        {/* <Link href={'/' + '?roomid=' + room.id}> */}
+                                            <Button onClick={() =>lookUp(room.id)}>Look up</Button>
+                                        {/* </Link> */}
                                     </TableCell>
                                 </TableRow>
                             )

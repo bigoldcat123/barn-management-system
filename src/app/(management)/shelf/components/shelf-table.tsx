@@ -32,9 +32,10 @@ export default function ShelfTable({
                         <TableHead>name</TableHead>
                         <TableHead>rows</TableHead>
                         <TableHead >columns</TableHead>
+                        <TableHead >position-x</TableHead>
+                        <TableHead >position-y</TableHead>
+                        
                         <TableHead >operations</TableHead>
-                        <TableHead >x</TableHead>
-                        <TableHead >y</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>

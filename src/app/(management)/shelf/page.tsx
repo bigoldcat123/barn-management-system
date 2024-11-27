@@ -7,6 +7,7 @@ export default async function Home() {
   return (
    <>
     <div>
+        
         <ShelfTable data={shelfs}/>
     </div>
    </>

@@ -7,6 +7,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 export default function ThreedRoom({
   data
 }: {
@@ -20,8 +21,7 @@ export default function ThreedRoom({
     }
   }> | undefined | null
 }) {
-  console.log(data)
-  const container = useRef<HTMLDivElement>(null);
+  const router = useRouter()
   function createBarn(scene: THREE.Scene, width: number, length: number) {
     // 围墙参数
     const wallHeight = 3;
@@ -29,16 +29,18 @@ export default function ThreedRoom({
     const wallLength = length;
     const wallWidth = width;
     // 添加平面作为地面
+    const texture = new THREE.TextureLoader().load('/t2.jpg'); // 替换为你的纹理图片路径
     const planeGeometry = new THREE.PlaneGeometry(width, length);
-    const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xcccccc, side: THREE.DoubleSide });
+    const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xcccccc, side: THREE.DoubleSide ,map: texture});
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.rotation.x = -Math.PI / 2; // 使平面水平
     scene.add(plane);
 
 
+    const texturewall = new THREE.TextureLoader().load('/t3.jpg');
 
     // 创建墙体材质
-    const wallMaterial = new THREE.MeshBasicMaterial({ color: 0x8B0000 });
+    const wallMaterial = new THREE.MeshBasicMaterial({map:texturewall });
 
     // 创建四面墙
     const frontWall = new THREE.Mesh(
@@ -64,6 +66,13 @@ export default function ThreedRoom({
   }
 
   useEffect(() => {
+    function onkeydown(e: KeyboardEvent) {
+      console.log(e.key)
+      if (e.key == 'Escape') {
+        router.back()
+      }
+    }
+    window.addEventListener('keydown',onkeydown)
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     // 添加坐标轴辅助线
@@ -77,12 +86,7 @@ export default function ThreedRoom({
     control.update()
 
     createBarn(scene, data?.width! + 2, data?.length! + 2)
-    // for (let index = 0; index < 60; index++) {
-    //   for (let j = 0; j < 30; j++) {
-    //     createShelf(j - data!.width! / 2 ,index - data!.length / 2,scene,index * j + 1000);
-    //   }
-    // }
-    //
+
     data?.shelves.forEach(shelf => {
       createShelf(shelf, data.length, data.width, scene);
     })
@@ -91,6 +95,11 @@ export default function ThreedRoom({
       renderer.render(scene, camera);
     }
     renderer.setAnimationLoop(animate);
+    return () => {
+      window.removeEventListener('keydown', onkeydown)
+      // renderer.dispose()
+      renderer.domElement.remove()
+    }
   }, [])
   return (
     <>
@@ -108,6 +117,24 @@ function createShelf(shelf: Prisma.ShelfGetPayload<{
   const geo = new THREE.BoxGeometry(2, shelf.rows * 0.5, shelf.columns * 0.5);
   const mat = new THREE.MeshBasicMaterial({ color: color });
   const mesh = new THREE.Mesh(geo, mat);
+  mesh.add(new THREE.AxesHelper(5))
   mesh.position.set(shelf.x - width / 2, shelf.rows * 0.25, shelf.y - length / 2);
+// add stuff to shelf
+  const geo2 = new THREE.BoxGeometry(3, 0.8, 0.8);
+  const mat2 = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+  const mesh2 = new THREE.Mesh(geo2, mat2);
+  mesh2.position.set(0, -shelf.rows * 0.25 + 0.5, shelf.columns * 0.25 - 0.5);
+  // row 2 column 3
+  // mesh2.position.y += 1;
+  // mesh2.position.z -= 2
+
+  shelf.stuff.forEach(stuff => {
+    const mesh3 = mesh2.clone();
+    mesh3.position.y += stuff.row - 1;
+    mesh3.position.z -= stuff.column - 1;
+    mesh.add(mesh3)
+  })
+
+  // mesh.add(mesh2)
   scene.add(mesh);
 }
