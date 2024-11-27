@@ -114,16 +114,17 @@ function createShelf(shelf: Prisma.ShelfGetPayload<{
   }
 }>, length: number, width: number, scene: THREE.Scene, color: number = 0x00ff00) {
   // throw new Error("Function not implemented.");
-  const geo = new THREE.BoxGeometry(2, shelf.rows * 0.5, shelf.columns * 0.5);
+  const geo = new THREE.BoxGeometry(2, shelf.rows , shelf.columns );
   const mat = new THREE.MeshBasicMaterial({ color: color });
   const mesh = new THREE.Mesh(geo, mat);
   mesh.add(new THREE.AxesHelper(5))
-  mesh.position.set(shelf.x - width / 2, shelf.rows * 0.25, shelf.y - length / 2);
+  mesh.position.set(shelf.x - width / 2, shelf.rows * 0.5, shelf.y - length / 2);
+  
 // add stuff to shelf
   const geo2 = new THREE.BoxGeometry(3, 0.8, 0.8);
   const mat2 = new THREE.MeshBasicMaterial({ color: 0x0000ff });
   const mesh2 = new THREE.Mesh(geo2, mat2);
-  mesh2.position.set(0, -shelf.rows * 0.25 + 0.5, shelf.columns * 0.25 - 0.5);
+  mesh2.position.set(0, -shelf.rows * 0.5+ 0.5, shelf.columns * 0.5 - 0.5);
   // row 2 column 3
   // mesh2.position.y += 1;
   // mesh2.position.z -= 2

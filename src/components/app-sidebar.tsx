@@ -53,17 +53,17 @@ const data = {
   projects: [
     {
       name: "Room",
-      url: "/room",
+      url: "/room?page=1",
       icon: SquareTerminal,
     },
     {
       name: "Shelf",
-      url: "/shelf",
+      url: "/shelf?page=1",
       icon: Frame,
     },
     {
       name: "Stuff",
-      url: "/stuff",
+      url: "/stuff?page=1",
       icon: PieChart,
     },
     {

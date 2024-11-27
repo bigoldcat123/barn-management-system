@@ -8,10 +8,13 @@ export async function getShelfById(id: number) {
     return shelf
 }
 
-export async function pageShelf(page: number, pageSize: number) {
+export async function pageShelf(page: number, pageSize: number = 10) {
     const shelves = await db.shelf.findMany({
         skip: (page - 1) * pageSize,
-        take: pageSize
+        take: pageSize,
+        include:{
+            category:true
+        }
     })
     return shelves
 }

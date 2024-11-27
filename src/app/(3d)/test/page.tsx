@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import Link from "next/link";
 export default function Page() {
   const container = useRef<HTMLDivElement>(null);
@@ -13,32 +14,69 @@ export default function Page() {
   useEffect(() => {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    scene.fog = new THREE.Fog(0xcccccc, 10, 15);
-
+    // scene.fog = new THREE.Fog(0xcccccc, 10, 15);
+    //add light
+    // const light = new THREE.AmbientLight(0x404040); // soft white light
+    // scene.add(light);
+    // 添加平行光
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // 白色平行光，强度为 1
+    directionalLight.position.set(5, 10, 7.5);
+    scene.add(directionalLight);
     // 添加坐标轴辅助线
     const axesHelper = new THREE.AxesHelper(5); // 参数为轴的长度
-    // scene.add(axesHelper);
-    const renderer = new THREE.WebGLRenderer();
+    scene.add(axesHelper);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
     camera.position.z = 5;
     let control = new OrbitControls(camera, renderer.domElement)
     control.update()
 
-    const geomatry = new THREE.BoxGeometry();
+
+    let cube2 = new THREE.Mesh(
+      new THREE.BoxGeometry(1, 1, 1),
+      new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+    )
+    // cube2.position.x = 2
+    scene.add(cube2)
+    // let cube3 = cube.clone()
+    // cube3.position.x = 4
+    // scene.add(cube3)
+
+    let size = 10;
+    let x = size / 2 + 2
+    let y = size / 2 + 5
+    let z = size / 2 - 12
+    let rowHeight = 14.5;
+    let leftOffset = size + size / 6
+    const geomatry = new THREE.BoxGeometry(size, size, size);
     const material = new THREE.MeshBasicMaterial({
       // map: new THREE.TextureLoader().load('/texture.jpg')
       color: 0x22254221,
     })
     const cube = new THREE.Mesh(geomatry, material);
-    scene.add(cube);
-    let cube2 = cube.clone()
-    cube2.position.x = 2
-    scene.add(cube2)
-    let cube3 = cube.clone()
-    cube3.position.x = 4
-    scene.add(cube3)
+    cube.position.set(x, y, z);
 
+
+    const loader = new GLTFLoader();
+
+    loader.load('/shelf.glb', function (gltf) {
+      gltf.scene.scale.set(1/size, 1/size, 1/size);
+      gltf.scene.add(cube)
+      let cub2 = cube.clone()
+      cub2.position.set(x + leftOffset * 1, y, z)
+      gltf.scene.add(cub2)
+
+      let cube3 = cube.clone()
+      cube3.position.set(x , y + rowHeight * 1, z)
+      gltf.scene.add(cube3)
+      scene.add(gltf.scene);
+
+    }, undefined, function (error) {
+
+      console.error(error);
+
+    });
 
     // 创建一个 Raycaster
     const raycaster = new THREE.Raycaster();
@@ -72,7 +110,7 @@ export default function Page() {
         // const direction = targetPosition.clone().sub(camera.position).normalize();
         // const newCameraPosition = targetPosition.clone().add(direction.multiplyScalar(-5));
         // camera.position.copy(newCameraPosition);
-        
+
         // 在这里可以执行其他操作，例如改变物体的属性
       } else {
         // 没有选中物体，执行其他操作，例如取消选中状态

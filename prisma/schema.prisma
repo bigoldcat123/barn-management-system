@@ -19,13 +19,27 @@ model Room{
 model Shelf {
   id        Int     @id @default(autoincrement())
   name      String
-  rows      Int
-  columns   Int
   x         Int
   y         Int
   stuff     Stuff[]
   room      Room    @relation(fields: [roomId], references: [id])
   roomId    Int
+  category  ShelfCategory  @relation(fields: [categoryId], references: [id])
+  categoryId Int
+}
+model ShelfCategory {
+  id Int @id @default(autoincrement())
+  rows      Int
+  columns   Int
+  width     Int
+  modle     String
+  scale Int
+  initX     Float
+  initY     Float
+  initZ     Float
+  rowHeight Float
+  leftOffset Float
+  shelves   Shelf[]
 }
 model Category {
   id        Int     @id @default(autoincrement())
