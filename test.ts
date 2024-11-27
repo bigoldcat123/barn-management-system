@@ -18,9 +18,9 @@ await db.shelfCategory.create({
         initX: 7,
         initY: 10,
         initZ: -7,
-        leftOffset:0,
+        leftOffset:11.6,
         modle:"/shelf.glb",
-        rowHeight:11.6,
+        rowHeight:14.5,
         rows:4,
         scale:10,
         width:2

@@ -57,23 +57,7 @@ export default function Page() {
     const cube = new THREE.Mesh(geomatry, material);
     cube.position.set(x, y, z);
 
-    function initShelf(shelfModel: THREE.Group<THREE.Object3DEventMap>, shelfCategort: ShelfCategory) {
-      const scale = shelfCategort.scale
-      shelfModel.scale.set(1 / scale, 1 / scale, 1 / scale);
-    }
-    function initStuff(stuffModel: THREE.Group<THREE.Object3DEventMap>, shelfCategort: ShelfCategory, stuffCagegroy: Category) {
-      const scale = stuffCagegroy.scale
-      stuffModel.scale.set(1 / scale, 1 / scale, 1 / scale);
-      stuffModel.position.set(
-        shelfCategort.initX + stuffCagegroy.initX,
-        shelfCategort.initY + stuffCagegroy.initY,
-        shelfCategort.initZ + stuffCagegroy.initZ
-      )
-    }
-    function setStuffPosition(stuffModel: THREE.Group<THREE.Object3DEventMap>, shelfCategort: ShelfCategory,row:number,column: number) {
-      stuffModel.position.x += shelfCategort.leftOffset * (column - 1)
-      stuffModel.position.y += shelfCategort.rowHeight * (row - 1)
-    }
+    
     const loader = new GLTFLoader();
 
     loader.load('/shelf.glb', async function (gltf) {
@@ -96,7 +80,8 @@ export default function Page() {
       dog.scene.scale.set(
         dog.scene.scale.x * size,
         dog.scene.scale.y * size,
-        dog.scene.scale.z * size)
+        dog.scene.scale.z * size
+      )
 
       dog.scene.position.set(x + dog.scene.position.x + leftOffset, y + dog.scene.position.y + rowHeight, z + dog.scene.position.z)
 
