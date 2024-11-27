@@ -23,7 +23,8 @@ export async function getRoomWithShelvesById(id:number) {
             include:{
                 shelves:{
                     include:{
-                        stuff:true
+                        stuff:true,
+                        category:true
                     }
                 }
             }

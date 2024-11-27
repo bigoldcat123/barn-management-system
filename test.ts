@@ -1,48 +1,28 @@
 import db from "@/db";
-await db.room.create({
-    data:{
-        name: "room1",
-        width: 10,
-        length: 10,
-        shelves:{
-            create:[
-                
-                    {
-                        name: "shelf1",
-                        rows: 10,
-                        columns: 10,
-                        x:1,
-                        y:1,
-                    },
-                    {
-                        name: "shelf2",
-                        rows: 10,
-                        columns: 10,
-                        x:1,
-                        y:1,
-                    },
-                    {
-                        name: "shelf3",
-                        rows: 10,
-                        columns: 10,
-                        x:1,
-                        y:1,
-                    },
-                    {
-                        name: "shelf4",
-                        rows: 10,
-                        columns: 10,
-                        x:1,
-                        y:1,
-                    },
-                    {
-                        name: "shelf5",
-                        rows: 10,
-                        columns: 10,
-                        x:1,
-                        y:1,
-                    },
-            ]
-        }
+
+
+await db.category.create({
+    data: {
+        scale: 8,
+        initX: 0,
+        initY: 3,
+        initZ: 5,
+        model: "/dog.glb",
+        name: "dog"
+    }
+})
+
+await db.shelfCategory.create({
+    data: {
+        columns:2,
+        initX: 7,
+        initY: 10,
+        initZ: -7,
+        leftOffset:0,
+        modle:"/shelf.glb",
+        rowHeight:11.6,
+        rows:4,
+        scale:10,
+        width:2
     }
 })

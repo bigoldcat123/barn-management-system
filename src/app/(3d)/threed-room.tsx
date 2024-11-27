@@ -1,6 +1,6 @@
 'use client'
 
-import { Prisma } from "@prisma/client";
+import { Category, Prisma, ShelfCategory } from "@prisma/client";
 import { useEffect, useRef } from "react";
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -8,6 +8,7 @@ import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.j
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 export default function ThreedRoom({
   data
 }: {
@@ -15,7 +16,8 @@ export default function ThreedRoom({
     include: {
       shelves: {
         include: {
-          stuff: true
+          stuff: true,
+          category:true
         }
       }
     }
@@ -108,34 +110,60 @@ export default function ThreedRoom({
   );
 }
 
-function createShelf(shelf: Prisma.ShelfGetPayload<{
+async function createShelf(shelf: Prisma.ShelfGetPayload<{
   include: {
-    stuff: true
+    stuff: true,
+   category:true 
   }
 }>, length: number, width: number, scene: THREE.Scene, color: number = 0x00ff00) {
   // throw new Error("Function not implemented.");
-  const geo = new THREE.BoxGeometry(2, shelf.rows , shelf.columns );
-  const mat = new THREE.MeshBasicMaterial({ color: color });
-  const mesh = new THREE.Mesh(geo, mat);
-  mesh.add(new THREE.AxesHelper(5))
-  mesh.position.set(shelf.x - width / 2, shelf.rows * 0.5, shelf.y - length / 2);
+  const loader = new GLTFLoader()
+  const shelfModel = await loader.loadAsync(shelf.category.modle)
+
+  initShelf(shelfModel.scene,shelf.category)
+
+  // const geo = new THREE.BoxGeometry(2, shelf.category.rows , shelf.category.columns );
+  // const mat = new THREE.MeshBasicMaterial({ color: color });
+  // const mesh = new THREE.Mesh(geo, mat);
+  // mesh.add(new THREE.AxesHelper(5))
+  shelfModel.scene.position.set(shelf.x - width / 2, shelf.category.rows * 0.5, shelf.y - length / 2);
   
 // add stuff to shelf
-  const geo2 = new THREE.BoxGeometry(3, 0.8, 0.8);
-  const mat2 = new THREE.MeshBasicMaterial({ color: 0x0000ff });
-  const mesh2 = new THREE.Mesh(geo2, mat2);
-  mesh2.position.set(0, -shelf.rows * 0.5+ 0.5, shelf.columns * 0.5 - 0.5);
+  // const geo2 = new THREE.BoxGeometry(3, 0.8, 0.8);
+  // const mat2 = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+  // const mesh2 = new THREE.Mesh(geo2, mat2);
+  // mesh2.position.set(0, -shelf.category.rows * 0.5+ 0.5, shelf.category.columns * 0.5 - 0.5);
   // row 2 column 3
   // mesh2.position.y += 1;
   // mesh2.position.z -= 2
+ // TODO!!! 4:53 Wed Nov 27 2024
+  shelf.stuff.forEach(async stuff => {
+    // const mesh3 = mesh2.clone();
+    // mesh3.position.y += stuff.row - 1;
+    // mesh3.position.z -= stuff.column - 1;
+    // mesh.add(mesh3)
 
-  shelf.stuff.forEach(stuff => {
-    const mesh3 = mesh2.clone();
-    mesh3.position.y += stuff.row - 1;
-    mesh3.position.z -= stuff.column - 1;
-    mesh.add(mesh3)
   })
 
   // mesh.add(mesh2)
-  scene.add(mesh);
+  scene.add(shelfModel.scene);
+}
+
+
+function initShelf(shelfModel: THREE.Group<THREE.Object3DEventMap>, shelfCategort: ShelfCategory) {
+  const scale = shelfCategort.scale
+  shelfModel.scale.set(1 / scale, 1 / scale, 1 / scale);
+}
+function initStuff(stuffModel: THREE.Group<THREE.Object3DEventMap>, shelfCategort: ShelfCategory, stuffCagegroy: Category) {
+  const scale = stuffCagegroy.scale
+  stuffModel.scale.set(1 / scale, 1 / scale, 1 / scale);
+  stuffModel.position.set(
+    shelfCategort.initX + stuffCagegroy.initX,
+    shelfCategort.initY + stuffCagegroy.initY,
+    shelfCategort.initZ + stuffCagegroy.initZ
+  )
+}
+function setStuffPosition(stuffModel: THREE.Group<THREE.Object3DEventMap>, shelfCategort: ShelfCategory,row:number,column: number) {
+  stuffModel.position.x += shelfCategort.leftOffset * (column - 1)
+  stuffModel.position.y += shelfCategort.rowHeight * (row - 1)
 }
