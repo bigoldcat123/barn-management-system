@@ -1,3 +1,4 @@
+'use server'
 import db from '@/db'
 export async function getShelfById(id: number) {
     const shelf = await db.shelf.findUnique({
@@ -34,4 +35,22 @@ export async function getShelivesByRoomId(roomId:number) {
         console.error(e)
     }
     return []
+}
+export async function createShelf(init:string,formdata:FormData) {
+    let data = Object.fromEntries(formdata)
+    try {
+        await db.shelf.create({
+            data:{
+                name:data.name as string,
+                x:Number(data.x),
+                y:Number(data.y),
+                roomId:Number(data.roomId),
+                categoryId:Number(data.categoryId)
+            }
+        })
+    }catch(e) {
+        console.error(e)
+        return 'error'
+    }
+    return init
 }
